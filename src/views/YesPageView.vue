@@ -44,6 +44,7 @@ const router = useRouter();
 
   @media screen and (max-width: 600px) {
     width: 100%;
+    overflow-y: hidden;
   }
 
   .first-container {
