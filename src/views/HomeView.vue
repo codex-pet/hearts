@@ -4,17 +4,32 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 const showFirstContainer = ref(true);
-const yesButtonScale = ref(1); // Track scale size
-const noButtonTexts = ["No :<", "Sure nana ling?", "di najd mahanyo :<", "Last najud!", "mo iyak nako! 😢"];
-const noClickCount = ref(0); // Track clicks on the No button
+const yesButtonScale = ref(1);
+const noButtonTexts = ["No :<", "Sure nana ling?", "di najd mahanyo :<", "Last najud!", "ling please :<", "mo iyak nako! 😢", "huhuhu"];
+const noClickCount = ref(0);
+const noButtonPosition = ref({ top: 0, left: 0 });
+const showNoButton = ref(true); // Track visibility of the No button
 
 const toggleContainer = () => {
   showFirstContainer.value = !showFirstContainer.value;
 };
 
 const enlargeYesButton = () => {
-  yesButtonScale.value += 1.5; // Increase scale size on each click
-  noClickCount.value = (noClickCount.value + 1) % noButtonTexts.length; // Cycle through messages
+  if (noClickCount.value < 6) {
+    yesButtonScale.value += 1.5;
+    noClickCount.value++;
+
+    // Move the No button randomly
+    noButtonPosition.value = {
+      top: Math.random() * 200 - 100 + "px",
+      left: Math.random() * 200 - 100 + "px",
+    };
+  }
+
+  // Hide the No button after 6 clicks
+  if (noClickCount.value >= 6) {
+    showNoButton.value = false;
+  }
 };
 </script>
 
@@ -33,7 +48,15 @@ const enlargeYesButton = () => {
         <p class="text-title">Will you <br /> be my <br /> valentine??</p>
         <div class="btns">
           <button class="yes" :style="{ transform: `scale(${yesButtonScale})` }" @click="router.push('/yes')">Yes!</button>
-          <button class="no" @click="enlargeYesButton">{{ noButtonTexts[noClickCount] }}</button>
+          <button 
+            v-if="showNoButton"
+            class="no" 
+            @click="enlargeYesButton" 
+            :style="{ transform: `translate(${noButtonPosition.left}, ${noButtonPosition.top})` }"
+          >
+            {{ noButtonTexts[noClickCount] }}
+          </button>
+
         </div>
       </div>
     </div>
@@ -51,8 +74,6 @@ const enlargeYesButton = () => {
   height: 100vh;
   margin: 0 auto;
   overflow-y: hidden;
-
-  
   
   @media screen and (max-width: 600px) {
     margin: 0px 10px;
@@ -157,14 +178,14 @@ const enlargeYesButton = () => {
     height: 200px;
     border-radius: 50px;
     position: absolute;
-    left: 53%;
-    top: 40px;
+    left: 60%;
+    top: -10px;
 
     @media screen and (max-width: 600px) {
       width: 200px;
       height: 200px;
-      left: 40%;
-      top: 20px;
+      left: 50%;
+      top: 5px;
     }
   }
 
@@ -180,6 +201,7 @@ const enlargeYesButton = () => {
     display: flex;
     margin-top: 150px;
     justify-content: space-between;
+    position: relative;
 
     .yes {
       margin: 10px;
@@ -205,6 +227,8 @@ const enlargeYesButton = () => {
       font-size: 20px;
       font-weight: bold;
       cursor: pointer;
+      position: relative;
+      transition: transform 0.5s ease-in-out;
 
       @media screen and (max-width: 600px) {
         margin-left: 75px;
